@@ -35,3 +35,7 @@ sourceSets {
 application {
     mainClass = 'com.angrybirds.DesktopLauncher'
 }
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}

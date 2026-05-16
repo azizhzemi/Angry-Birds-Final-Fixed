@@ -13,11 +13,15 @@ public class Pig {
     private Texture texture;
     private float radius;
     private Vector2 visualPosition;
+    private float health;
+    private boolean destroyed;
 
     public Pig(PhysicsWorld physicsWorld, float x, float y, float radius) {
         this.radius = radius;
         this.body = physicsWorld.createPigBody(x, y, radius);
+        this.body.setUserData(this);
         this.visualPosition = new Vector2(x, y);
+        this.health = radius * 1.8f;
 
         // Create a detailed pig texture with face
         int size = (int)radius * 2 + 2;
@@ -75,6 +79,7 @@ public class Pig {
     }
 
     public void draw(SpriteBatch batch) {
+        if (destroyed) return;
         float x = visualPosition.x - radius;
         float y = visualPosition.y - radius;
         float rotation = body.getAngle() * com.badlogic.gdx.math.MathUtils.radiansToDegrees;
@@ -84,6 +89,18 @@ public class Pig {
 
     public Body getBody() {
         return body;
+    }
+
+    public boolean isDestroyed() {
+        return destroyed;
+    }
+
+    public void damage(float amount) {
+        if (destroyed) return;
+        health -= amount;
+        if (health <= 0f) {
+            destroyed = true;
+        }
     }
 
     public void dispose() {

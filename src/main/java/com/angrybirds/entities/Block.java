@@ -17,6 +17,8 @@ public class Block {
     private float height;
     private Vector2 visualPosition;
     private BlockType type;
+    private float health;
+    private boolean destroyed;
 
     public Block(PhysicsWorld physicsWorld, float x, float y, float width, float height, boolean isDynamic) {
         this(physicsWorld, x, y, width, height, isDynamic, BlockType.WOOD);
@@ -27,7 +29,9 @@ public class Block {
         this.height = height;
         this.type = type;
         this.body = physicsWorld.createBlockBody(x, y, width, height, isDynamic);
+        this.body.setUserData(this);
         this.visualPosition = new Vector2(x, y);
+        this.health = (type == BlockType.ICE ? 35f : 55f) + (width * height / 320f);
 
         // Create texture based on block type
         Pixmap pixmap = new Pixmap((int)width, (int)height, Pixmap.Format.RGBA8888);
@@ -63,6 +67,7 @@ public class Block {
     }
 
     public void draw(SpriteBatch batch) {
+        if (destroyed) return;
         float x = visualPosition.x - width / 2;
         float y = visualPosition.y - height / 2;
         float rotation = body.getAngle() * com.badlogic.gdx.math.MathUtils.radiansToDegrees;
@@ -72,6 +77,18 @@ public class Block {
 
     public Body getBody() {
         return body;
+    }
+
+    public boolean isDestroyed() {
+        return destroyed;
+    }
+
+    public void damage(float amount) {
+        if (destroyed) return;
+        health -= amount;
+        if (health <= 0f) {
+            destroyed = true;
+        }
     }
 
     public void dispose() {

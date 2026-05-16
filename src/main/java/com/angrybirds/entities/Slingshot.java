@@ -11,15 +11,22 @@ public class Slingshot {
     private Bird currentBird;
     private Texture baseTexture;
     private float maxPullDistance = 100f;
-    private float launchStrength = 2.0f;
+    private float launchStrength = 3.1f;
 
     public Slingshot(float x, float y) {
         this.position = new Vector2(x, y);
         
-        // Create a simple brown rectangle as placeholder for slingshot base
-        Pixmap pixmap = new Pixmap(20, 100, Pixmap.Format.RGBA8888);
-        pixmap.setColor(new Color(0.5f, 0.3f, 0.1f, 1f));
+        Pixmap pixmap = new Pixmap(70, 120, Pixmap.Format.RGBA8888);
+        pixmap.setColor(0, 0, 0, 0);
         pixmap.fill();
+        pixmap.setColor(new Color(0.36f, 0.17f, 0.05f, 1f));
+        pixmap.fillRectangle(30, 30, 12, 90);
+        pixmap.fillRectangle(12, 62, 12, 58);
+        pixmap.fillRectangle(48, 62, 12, 58);
+        pixmap.setColor(new Color(0.18f, 0.08f, 0.03f, 1f));
+        pixmap.drawRectangle(30, 30, 12, 90);
+        pixmap.drawRectangle(12, 62, 12, 58);
+        pixmap.drawRectangle(48, 62, 12, 58);
         this.baseTexture = new Texture(pixmap);
         pixmap.dispose();
     }
@@ -32,7 +39,7 @@ public class Slingshot {
     }
     
     public void draw(SpriteBatch batch) {
-        batch.draw(baseTexture, position.x - 10, position.y);
+        batch.draw(baseTexture, position.x - 35, position.y);
         
         // Draw elastic if bird is being pulled
         if (currentBird != null && currentBird.getState() == Bird.State.ON_SLINGSHOT) {

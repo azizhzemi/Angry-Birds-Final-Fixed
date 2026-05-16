@@ -120,6 +120,16 @@ public class PhysicsWorld {
     public World getWorld() {
         return world;
     }
+
+    public void destroyBody(Body body) {
+        if (body != null) {
+            world.destroyBody(body);
+        }
+    }
+
+    public void setContactListener(ContactListener listener) {
+        world.setContactListener(listener);
+    }
     
     public void dispose() {
         world.dispose();

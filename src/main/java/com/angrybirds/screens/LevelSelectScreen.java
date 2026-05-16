@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -17,7 +18,7 @@ import com.angrybirds.AngryBirdsGame;
 public class LevelSelectScreen implements Screen {
 
     private static final int LEVEL_COUNT = 5;
-    private static final int UNLOCKED_COUNT = 1;
+    private static final int UNLOCKED_COUNT = 5;
     private static final float CARD_SIZE = 140f;
     private static final float CARD_GAP = 30f;
 
@@ -28,6 +29,7 @@ public class LevelSelectScreen implements Screen {
     private final BitmapFont hintFont;
     private final OrthographicCamera camera;
     private final Viewport viewport;
+    private final Vector3 touchPoint;
 
     public LevelSelectScreen(AngryBirdsGame game) {
         this.game = game;
@@ -48,13 +50,16 @@ public class LevelSelectScreen implements Screen {
         this.camera = new OrthographicCamera();
         this.viewport = new FitViewport(AngryBirdsGame.V_WIDTH, AngryBirdsGame.V_HEIGHT, camera);
         this.viewport.apply(true);
+        this.touchPoint = new Vector3();
     }
 
     @Override public void show() {}
 
     @Override
     public void render(float delta) {
-        handleInput();
+        if (handleInput()) {
+            return;
+        }
 
         Gdx.gl.glClearColor(0.40f, 0.70f, 0.92f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -112,19 +117,36 @@ public class LevelSelectScreen implements Screen {
         return f.getCache().addText(s, 0, 0).width;
     }
 
-    private void handleInput() {
+    private boolean handleInput() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)
                 || Gdx.input.isKeyJustPressed(Input.Keys.B)) {
             game.showMenu();
-            return;
+            return true;
         }
         for (int i = 0; i < LEVEL_COUNT; i++) {
             int key = Input.Keys.NUM_1 + i;
             if (Gdx.input.isKeyJustPressed(key) && i < UNLOCKED_COUNT) {
                 game.showGame(i);
-                return;
+                return true;
             }
         }
+        if (Gdx.input.justTouched()) {
+            touchPoint.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+            viewport.unproject(touchPoint);
+            float totalWidth = LEVEL_COUNT * CARD_SIZE + (LEVEL_COUNT - 1) * CARD_GAP;
+            float startX = (AngryBirdsGame.V_WIDTH - totalWidth) / 2f;
+            float y = (AngryBirdsGame.V_HEIGHT - CARD_SIZE) / 2f;
+            for (int i = 0; i < LEVEL_COUNT; i++) {
+                float x = startX + i * (CARD_SIZE + CARD_GAP);
+                boolean inside = touchPoint.x >= x && touchPoint.x <= x + CARD_SIZE
+                        && touchPoint.y >= y && touchPoint.y <= y + CARD_SIZE;
+                if (inside && i < UNLOCKED_COUNT) {
+                    game.showGame(i);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override

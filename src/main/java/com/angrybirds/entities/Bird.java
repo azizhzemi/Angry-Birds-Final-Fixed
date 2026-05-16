@@ -28,8 +28,14 @@ public class Bird {
         
         // Create a simple green circle texture as placeholder
         Pixmap pixmap = new Pixmap((int)radius * 2 + 2, (int)radius * 2 + 2, Pixmap.Format.RGBA8888);
-        pixmap.setColor(Color.GREEN);
+        pixmap.setColor(new Color(0.86f, 0.08f, 0.05f, 1f));
         pixmap.fillCircle((int)radius + 1, (int)radius + 1, (int)radius);
+        pixmap.setColor(new Color(1f, 0.82f, 0.18f, 1f));
+        pixmap.fillTriangle((int)(radius * 1.6f), (int)(radius + 1), (int)(radius * 2.2f), (int)(radius * 0.8f), (int)(radius * 2.2f), (int)(radius * 1.2f));
+        pixmap.setColor(Color.WHITE);
+        pixmap.fillCircle((int)(radius * 0.78f), (int)(radius * 1.35f), Math.max(2, (int)(radius * 0.18f)));
+        pixmap.setColor(Color.BLACK);
+        pixmap.fillCircle((int)(radius * 0.84f), (int)(radius * 1.35f), Math.max(1, (int)(radius * 0.08f)));
         pixmap.setColor(Color.BLACK);
         pixmap.drawCircle((int)radius + 1, (int)radius + 1, (int)radius);
         this.texture = new Texture(pixmap);
@@ -54,6 +60,14 @@ public class Bird {
         state = State.FLYING;
         body.setActive(true);
         body.applyLinearImpulse(impulse.scl(1/PhysicsWorld.PPM), body.getWorldCenter(), true);
+    }
+
+    public boolean isStopped() {
+        return state == State.FLYING && body.getLinearVelocity().len() < 0.25f;
+    }
+
+    public boolean isOutOfBounds(float width, float height) {
+        return visualPosition.x < -80 || visualPosition.x > width + 120 || visualPosition.y < -80 || visualPosition.y > height + 160;
     }
     
     public void setVisualPosition(float x, float y) {
